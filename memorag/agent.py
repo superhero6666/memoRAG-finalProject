@@ -1,3 +1,5 @@
+import openai
+import time
 from openai import OpenAI
 from openai import AzureOpenAI
 from functools import wraps

@@ -11,7 +11,6 @@ import time
 import json
 import tiktoken
 import copy
-from minference import MInference
 from langdetect import detect
 from .memorag import Model, merge_inputs
 from .retrieval import DenseRetriever, FaissIndex

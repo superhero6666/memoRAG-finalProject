@@ -12,7 +12,7 @@ import os
 import json
 import tiktoken
 import copy
-from minference import MInference
+# from minference import MInference
 
 logger = logging.get_logger(__name__)          
 
@@ -136,9 +136,9 @@ class Model:
 
         return inputs
 
-    def minference_patch(self, model_type:str="meta-llama/Meta-Llama-3.1-8B-Instruct"):
-        minference_patch = MInference("minference", model_type)
-        self.model=minference_patch(self.model)
+    # def minference_patch(self, model_type:str="meta-llama/Meta-Llama-3.1-8B-Instruct"):
+    #     minference_patch = MInference("minference", model_type)
+    #     self.model=minference_patch(self.model)
 
     def reload_model(self):
         # TODO 
@@ -214,7 +214,7 @@ class Memory(Model):
                 self.model(**context_inputs)
             self.memory = self.model.memory.export()
         elif self.memo_type == "longllm":
-            self.minference_patch()
+            # self.minference_patch()
             self.memory = DynamicCache()
             with torch.no_grad():
                 model_outputs = self.model(**context_inputs, past_key_values=self.memory)
