@@ -35,8 +35,8 @@ class Model:
         access_token: str="",
         beacon_ratio: int=None,
         load_in_4bit: bool=False,
-        enable_flash_attn: bool=True
-    ):  
+        enable_flash_attn: bool=False
+    ):
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         if enable_flash_attn:
             if model_name_or_path.find("mistral") != -1:
@@ -47,23 +47,23 @@ class Model:
             attn_implementation = None
 
         if model_name_or_path.find("memorag") == -1:
-            load_in_4bit = True
+            load_in_4bit = False
 
         self.model_kwargs = {
             "cache_dir": cache_dir,
             "token": access_token,
             "device_map": {"": device},
-            "attn_implementation": attn_implementation,
+            "attn_implementation": None,
             "torch_dtype": torch.bfloat16,
             "trust_remote_code": True,
         }
         self.model_name_or_path = model_name_or_path
 
-        if load_in_4bit:
-            quant_config = BitsAndBytesConfig(
-                    load_in_4bit=load_in_4bit
-                )
-            self.model_kwargs["quantization_config"] = quant_config
+        # if load_in_4bit:
+        #     quant_config = BitsAndBytesConfig(
+        #             load_in_4bit=load_in_4bit
+        #         )
+        #     self.model_kwargs["quantization_config"] = quant_config
 
         if beacon_ratio and model_name_or_path.find("memorag") != -1:
             self.model_kwargs["beacon_ratio"] = [beacon_ratio]
@@ -324,7 +324,7 @@ class MemoRAG:
         access_token:Optional[str]=None,
         beacon_ratio:int=4,
         load_in_4bit:bool=False,
-        enable_flash_attn: bool=True):
+        enable_flash_attn: bool=False):
 
         if mem_model_name_or_path.lower().find("chinese") != -1:
             self.prompts = zh_prompts
@@ -333,7 +333,7 @@ class MemoRAG:
             self.prompts = en_prompts
 
         self.mem_model = Memory(
-            mem_model_name_or_path, cache_dir=cache_dir, beacon_ratio=beacon_ratio, load_in_4bit=load_in_4bit, enable_flash_attn=enable_flash_attn)
+            mem_model_name_or_path, cache_dir=cache_dir, beacon_ratio=beacon_ratio, load_in_4bit=load_in_4bit, enable_flash_attn=enable_flash_attn, access_token=access_token)
 
         if gen_model_name_or_path:
             self.gen_model = Model(
@@ -476,5 +476,5 @@ class MemoRAG:
         elif self.gen_model.__class__.__name__ == "Model":
             # `Model.generate` does NOT have  parameter `with_cache`
             output = self.gen_model.generate(prompt, max_new_tokens=max_new_tokens)[0]
-        torch.cuda.empty_cache() 
+        torch.cuda.empty_cache()
         return output
