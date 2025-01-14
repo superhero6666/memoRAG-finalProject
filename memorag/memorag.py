@@ -35,9 +35,10 @@ class Model:
         access_token: str="",
         beacon_ratio: int=None,
         load_in_4bit: bool=False,
-        enable_flash_attn: bool=True
-    ):  
-        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        enable_flash_attn: bool=False
+    ):
+        # "cuda" if torch.cuda.is_available() else
+        device = torch.device("cpu")
         if enable_flash_attn:
             if model_name_or_path.find("mistral") != -1:
                 attn_implementation = "sdpa"
@@ -47,7 +48,7 @@ class Model:
             attn_implementation = None
 
         if model_name_or_path.find("memorag") == -1:
-            load_in_4bit = True
+            load_in_4bit = False
 
         self.model_kwargs = {
             "cache_dir": cache_dir,
@@ -324,7 +325,7 @@ class MemoRAG:
         access_token:Optional[str]=None,
         beacon_ratio:int=4,
         load_in_4bit:bool=False,
-        enable_flash_attn: bool=True):
+        enable_flash_attn: bool=False):
 
         if mem_model_name_or_path.lower().find("chinese") != -1:
             self.prompts = zh_prompts

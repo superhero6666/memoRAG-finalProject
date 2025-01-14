@@ -53,10 +53,14 @@ class FaissIndex:
 
     def save(self, index_path):
         logger.info(f"saving index at {index_path}...")
-        if isinstance(self.index, faiss.GpuIndex):
-            index = faiss.index_gpu_to_cpu(self.index)
-        else:
-            index = self.index
+        # if isinstance(self.index, faiss.GpuIndex):
+        #     index = faiss.index_gpu_to_cpu(self.index)
+        # else:
+        index = self.index
+        import os
+        if not os.path.exists(index_path):
+            with open(index_path, "w") as f:
+                f.write("")
         faiss.write_index(index, index_path)
 
     def search(self, query, hits):
@@ -96,7 +100,7 @@ class DenseRetriever:
             dtype = torch.float32
 
         self.tokenizer = AutoTokenizer.from_pretrained(encoder, cache_dir=cache_dir)
-        self.encoder = AutoModel.from_pretrained(encoder, cache_dir=cache_dir, torch_dtype=dtype, device_map={'': "cuda"}, load_in_4bit=load_in_4bit).eval()
+        self.encoder = AutoModel.from_pretrained(encoder, cache_dir=cache_dir, torch_dtype=dtype, device_map={'': "cpu"}, load_in_4bit=load_in_4bit).eval()
 
         self.ndim = self.encoder.config.hidden_size
         self._index = None
