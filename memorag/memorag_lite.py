@@ -18,7 +18,9 @@ from .prompt import en_prompts, zh_prompts
 import pynvml
 
 def get_first_gpu_memory():
-    pynvml.nvmlInit()
+    if not pynvml.nvmlInit():
+        return 0;
+
 
     device_count = pynvml.nvmlDeviceGetCount()
 

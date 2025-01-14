@@ -334,7 +334,7 @@ class MemoRAG:
             self.prompts = en_prompts
 
         self.mem_model = Memory(
-            mem_model_name_or_path, cache_dir=cache_dir, beacon_ratio=beacon_ratio, load_in_4bit=load_in_4bit, enable_flash_attn=enable_flash_attn)
+            mem_model_name_or_path, cache_dir=cache_dir, beacon_ratio=beacon_ratio, load_in_4bit=load_in_4bit, enable_flash_attn=enable_flash_attn, access_token=access_token)
 
         if gen_model_name_or_path:
             self.gen_model = Model(
@@ -477,5 +477,5 @@ class MemoRAG:
         elif self.gen_model.__class__.__name__ == "Model":
             # `Model.generate` does NOT have  parameter `with_cache`
             output = self.gen_model.generate(prompt, max_new_tokens=max_new_tokens)[0]
-        torch.cuda.empty_cache() 
+        torch.cuda.empty_cache()
         return output
